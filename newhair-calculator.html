@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="description" content="뉴헤어모발성형외과 무료 모수 계산기 - AI가 탈모 단계를 분석하여 예상 필요 모수를 알려드립니다.">
+<meta property="og:title" content="모수 계산기 · 뉴헤어모발성형외과">
+<meta property="og:description" content="간단한 정보와 사진으로 내게 필요한 모발이식 모수를 미리 알아보세요.">
+<meta property="og:type" content="website">
+<title>모수 계산기 · 뉴헤어모발성형외과</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --p: #1a3a5c;
+    --a: #2e7db8;
+    --g: #c9a84c;
+    --lb: #e8f3fb;
+    --bg: #f7f5f0;
+    --w: #ffffff;
+    --t: #1a2740;
+    --m: #6b7c93;
+    --b: #d0dce8;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    font-family: 'Noto Sans KR', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: var(--bg);
+    position: relative;
+  }
+
+  /* ── Header ── */
+  .hd {
+    background: var(--p);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon {
+    width: 34px; height: 34px;
+    background: var(--g);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-text { color: #fff; font-size: 14px; font-weight: 700; line-height: 1.25; }
+  .logo-sub { color: var(--g); font-size: 8px; letter-spacing: .14em; text-transform: uppercase; }
+  .pg-num { color: rgba(255,255,255,.55); font-size: 13px; white-space: nowrap; }
+  .pg-num span { color: #fff; font-weight: 700; }
+
+  /* ── Progress ── */
+  .pb-wrap { height: 4px; background: #0f2a45; }
+  .pb-fill { height: 100%; background: var(--g); transition: width .4s ease; border-radius: 0 2px 2px 0; }
+
+  /* ── Body ── */
+  .bd { padding: 28px 20px 40px; }
+
+  .step-lbl { font-size: 11px; font-weight: 700; color: var(--a); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+  .step-ttl { font-size: 26px; font-weight: 700; color: var(--t); line-height: 1.35; margin-bottom: 8px; }
+  .step-desc { font-size: 13px; color: var(--m); line-height: 1.7; margin-bottom: 24px; }
+
+  /* ── Form ── */
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 12px; font-weight: 700; color: var(--t); margin-bottom: 7px; }
+  .req { color: #e53e3e; margin-left: 2px; }
+  .inp {
+    width: 100%; padding: 13px 15px;
+    border: 1.5px solid var(--b); border-radius: 10px;
+    font-size: 16px; font-family: inherit; color: var(--t);
+    background: #fff; outline: none; transition: border .2s;
+    -webkit-appearance: none;
+  }
+  .inp:focus { border-color: var(--a); }
+  .inp-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+  /* ── Gender Toggle ── */
+  .gender-tog {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border: 1.5px solid var(--b); border-radius: 10px; overflow: hidden;
+  }
+  .gt {
+    padding: 13px; text-align: center; cursor: pointer;
+    font-size: 15px; font-weight: 500; color: var(--m);
+    background: #fff; border: none; font-family: inherit; transition: all .2s;
+  }
+  .gt.sel { background: var(--p); color: #fff; }
+
+  /* ── Photo Upload ── */
+  .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .photo-box {
+    border: 1.5px solid var(--b); border-radius: 14px;
+    padding: 28px 12px; text-align: center; cursor: pointer;
+    background: #fff; transition: all .2s; position: relative; overflow: hidden;
+  }
+  .photo-box:hover, .photo-box.uploaded { border-color: var(--a); background: var(--lb); }
+  .photo-box.skip-box { border-style: dashed; background: var(--bg); }
+  .pb-icon { font-size: 30px; margin-bottom: 10px; }
+  .pb-name { font-size: 14px; font-weight: 600; color: var(--t); }
+  .pb-sub { font-size: 11px; color: var(--m); margin-top: 4px; }
+  .photo-thumb { width: 100%; height: 90px; object-fit: cover; border-radius: 8px; margin-bottom: 6px; }
+  .uploaded-badge {
+    position: absolute; top: 8px; right: 8px;
+    background: var(--a); color: #fff; font-size: 10px;
+    padding: 2px 8px; border-radius: 10px;
+  }
+
+  /* ── Stage Grid ── */
+  .stage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stage-btn {
+    border: 1.5px solid var(--b); border-radius: 14px;
+    padding: 18px 12px; cursor: pointer; background: #fff;
+    text-align: left; transition: all .2s; font-family: inherit;
+  }
+  .stage-btn:hover { border-color: var(--a); }
+  .stage-btn.sel { border-color: var(--a); background: var(--lb); }
+  .stage-head-svg { width: 68px; height: 68px; margin-bottom: 10px; }
+  .stage-name { font-size: 14px; font-weight: 700; color: var(--t); margin-bottom: 3px; }
+  .stage-sub { font-size: 11px; color: var(--m); line-height: 1.5; }
+
+  /* ── Area Grid ── */
+  .area-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .area-btn {
+    border: 1.5px solid var(--b); border-radius: 14px;
+    padding: 16px 14px; cursor: pointer; background: #fff;
+    display: flex; align-items: center; gap: 12px;
+    transition: all .2s; font-family: inherit;
+  }
+  .area-btn:hover { border-color: var(--a); }
+  .area-btn.sel { border-color: var(--a); background: var(--lb); }
+  .area-face { width: 46px; height: 46px; flex-shrink: 0; }
+  .area-name { font-size: 14px; font-weight: 600; color: var(--t); }
+
+  /* ── Option List ── */
+  .opt-list { display: flex; flex-direction: column; gap: 8px; }
+  .opt {
+    border: 1.5px solid var(--b); border-radius: 12px;
+    padding: 16px 18px; cursor: pointer; background: #fff;
+    transition: all .2s; display: flex; align-items: center;
+    justify-content: space-between; font-family: inherit;
+  }
+  .opt:hover { border-color: var(--a); }
+  .opt.sel { border-color: var(--a); background: var(--lb); }
+  .opt-check {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--a); display: none; align-items: center;
+    justify-content: center; color: #fff; font-size: 13px; flex-shrink: 0;
+  }
+  .opt.sel .opt-check { display: flex; }
+  .opt-main { font-size: 15px; font-weight: 600; color: var(--t); }
+  .opt-sub { font-size: 12px; color: var(--m); margin-top: 3px; }
+
+  /* ── Nav Buttons ── */
+  .nav { margin-top: 24px; display: flex; gap: 10px; }
+  .back {
+    padding: 14px 18px; border: 1.5px solid var(--b);
+    background: #fff; border-radius: 12px; cursor: pointer;
+    font-size: 15px; color: var(--m); font-family: inherit; transition: all .2s;
+  }
+  .back:hover { border-color: var(--a); color: var(--a); }
+  .nxt {
+    flex: 1; padding: 15px; background: var(--p); border: none;
+    border-radius: 12px; cursor: pointer; font-size: 15px;
+    font-weight: 700; color: #fff; font-family: inherit; transition: all .2s;
+  }
+  .nxt:hover { background: #1e4a7a; }
+  .nxt:disabled { background: var(--b); cursor: not-allowed; }
+
+  /* ── Notice ── */
+  .notice {
+    font-size: 11px; color: var(--m); margin-top: 16px;
+    display: flex; gap: 7px; align-items: flex-start; line-height: 1.6;
+  }
+
+  /* ── Analyzing ── */
+  .ana-wrap { display: none; text-align: center; padding: 60px 20px; }
+  .ana-wrap.vis { display: block; }
+  .ana-ring-wrap { width: 96px; height: 96px; margin: 0 auto 24px; position: relative; }
+  .ring1 {
+    width: 96px; height: 96px; border: 3px solid var(--b);
+    border-top-color: var(--a); border-radius: 50%;
+    animation: spin .9s linear infinite; position: absolute;
+  }
+  .ring2 {
+    width: 64px; height: 64px; border: 3px solid var(--b);
+    border-bottom-color: var(--g); border-radius: 50%;
+    animation: spin 1.4s linear infinite reverse;
+    position: absolute; top: 16px; left: 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .ana-ttl { font-size: 18px; font-weight: 700; color: var(--p); margin-bottom: 8px; }
+  .ana-desc { font-size: 13px; color: var(--m); margin-bottom: 20px; }
+  .ana-steps { list-style: none; max-width: 240px; margin: 0 auto; text-align: left; }
+  .as {
+    font-size: 13px; color: var(--m); padding: 6px 0;
+    display: flex; align-items: center; gap: 8px;
+    opacity: .35; transition: opacity .4s;
+  }
+  .as.done { opacity: 1; color: var(--a); }
+  .as.active { opacity: 1; color: var(--p); font-weight: 700; }
+
+  /* ── Result ── */
+  .res-card { background: #fff; border-radius: 18px; border: 1px solid var(--b); overflow: hidden; }
+  .res-hero {
+    background: linear-gradient(140deg, var(--p) 0%, #1e4a7a 55%, #0f2a45 100%);
+    padding: 32px 24px; text-align: center;
+  }
+  .res-lbl { color: var(--g); font-size: 10px; letter-spacing: .15em; text-transform: uppercase; margin-bottom: 12px; }
+  .res-big { font-size: 62px; font-weight: 700; color: #fff; line-height: 1; }
+  .res-unit { font-size: 16px; color: rgba(255,255,255,.6); margin-top: 6px; }
+  .res-range {
+    display: inline-block; background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.2); color: #fff;
+    font-size: 12px; padding: 5px 18px; border-radius: 20px; margin-top: 14px;
+  }
+  .res-body { padding: 22px 20px; }
+
+  .ai-box {
+    background: var(--lb); border: 1px solid #b3d4ed;
+    border-radius: 12px; padding: 16px; margin-bottom: 16px;
+  }
+  .ai-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .ai-badge {
+    background: var(--a); color: #fff; font-size: 10px;
+    padding: 3px 10px; border-radius: 20px; font-weight: 700; letter-spacing: .03em;
+  }
+  .ai-ttl { font-size: 14px; font-weight: 700; color: var(--p); }
+  .ai-txt { font-size: 13px; color: var(--t); line-height: 1.75; }
+
+  .d-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .di { background: var(--bg); border-radius: 10px; padding: 14px; }
+  .dk { font-size: 11px; color: var(--m); margin-bottom: 5px; }
+  .dv { font-size: 20px; font-weight: 700; color: var(--p); }
+  .ds { font-size: 11px; color: var(--m); margin-top: 3px; }
+
+  /* ── 카카오 Preview ── */
+  .kakao-preview {
+    background: #f2f2f2; border-radius: 12px;
+    padding: 14px; margin-bottom: 16px;
+  }
+  .kp-title { font-size: 11px; font-weight: 700; color: var(--m); margin-bottom: 10px; letter-spacing: .03em; }
+  .kp-bubble {
+    background: #fff; border-radius: 12px 12px 12px 4px;
+    padding: 14px 16px; font-size: 12px; color: #222;
+    line-height: 1.8; box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+  .kp-bubble strong { color: var(--p); }
+
+  .disc {
+    font-size: 11px; color: var(--m); line-height: 1.65;
+    padding: 12px 14px; background: #f9fafb;
+    border-radius: 8px; border-left: 3px solid var(--b); margin-bottom: 18px;
+  }
+
+  /* ── 카카오 CTA ── */
+  .kakao-cta {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 17px;
+    background: #FEE500; border: none; border-radius: 14px; cursor: pointer;
+    font-size: 16px; font-weight: 700; color: #191919; font-family: inherit;
+    transition: all .2s; margin-bottom: 10px; text-decoration: none;
+  }
+  .kakao-cta:hover { background: #f5db00; transform: translateY(-1px); }
+  .kakao-cta:active { transform: translateY(0); }
+  .kakao-icon { width: 26px; height: 26px; flex-shrink: 0; }
+  .kakao-sub { text-align: center; font-size: 11px; color: var(--m); line-height: 1.6; margin-bottom: 16px; }
+
+  .restart-btn {
+    display: block; width: 100%; padding: 13px;
+    background: none; border: 1.5px solid var(--b); border-radius: 12px;
+    cursor: pointer; font-size: 13px; color: var(--m); font-family: inherit;
+    transition: all .2s;
+  }
+  .restart-btn:hover { border-color: var(--a); color: var(--a); }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <div class="hd">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 2C10 2 6 5 6 10C6 13.3 7.8 14.5 10 14.5C12.2 14.5 14 13.3 14 10C14 5 10 2 10 2Z" fill="white"/>
+          <path d="M10 14.5V18" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M7 17.5H13" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">뉴헤어모발성형외과</div>
+        <div class="logo-sub">newhair hair clinic</div>
+      </div>
+    </div>
+    <div class="pg-num"><span id="cur-pg">1</span> / 6</div>
+  </div>
+  <div class="pb-wrap"><div class="pb-fill" id="pb-fill" style="width:16.6%"></div></div>
+
+  <div class="bd">
+
+    <!-- ── STEP 1: 본인 확인 ── -->
+    <div id="s1">
+      <div class="step-lbl">STEP 1 · 본인 확인</div>
+      <div class="step-ttl">먼저, 간단히<br>알려주세요</div>
+      <div class="step-desc">안내 결과를 안전하게 받아보실 수 있도록<br>기본 정보가 필요해요.</div>
+
+      <div class="field">
+        <label>이름 <span class="req">*</span></label>
+        <input class="inp" id="f-name" placeholder="홍길동" oninput="checkS1()">
+      </div>
+      <div class="field">
+        <label>성별 <span class="req">*</span></label>
+        <div class="gender-tog">
+          <button class="gt" id="gt-m" onclick="selGender('m')">남성</button>
+          <button class="gt" id="gt-f" onclick="selGender('f')">여성</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>생년월일 <span class="req">*</span></label>
+        <div class="inp-row">
+          <input class="inp" id="f-y" placeholder="1985" maxlength="4" inputmode="numeric" oninput="checkS1()">
+          <input class="inp" id="f-mo" placeholder="01" maxlength="2" inputmode="numeric" oninput="checkS1()">
+          <input class="inp" id="f-d" placeholder="15" maxlength="2" inputmode="numeric" oninput="checkS1()">
+        </div>
+      </div>
+      <div class="field">
+        <label>연락처 <span class="req">*</span></label>
+        <div class="inp-row">
+          <input class="inp" id="f-p1" placeholder="010" maxlength="3" inputmode="numeric" oninput="checkS1()">
+          <input class="inp" id="f-p2" placeholder="0000" maxlength="4" inputmode="numeric" oninput="checkS1()">
+          <input class="inp" id="f-p3" placeholder="0000" maxlength="4" inputmode="numeric" oninput="checkS1()">
+        </div>
+      </div>
+
+      <div class="notice">
+        🔒 <span>입력하신 정보는 뉴헤어모발성형외과의 진료 안내 외 목적으로 이용되지 않으며, 외부에 제공되지 않습니다.</span>
+      </div>
+      <div class="nav">
+        <button class="nxt" id="n1" onclick="goS(2)" disabled>다음 단계로</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 2: 두피 사진 ── -->
+    <div id="s2" class="hidden">
+      <div class="step-lbl">STEP 2 · 두피 사진</div>
+      <div class="step-ttl">사진을 올려주세요</div>
+      <div class="step-desc">정면·정수리·측면 중 가능한 만큼 올려주세요.<br>밝은 곳에서 찍은 사진일수록 정확해요.</div>
+
+      <div class="photo-grid">
+        <div class="photo-box" id="pb-front" onclick="triggerUpload('front')">
+          <div class="pb-icon">📷</div>
+          <div class="pb-name">정면</div>
+          <div class="pb-sub">이마 라인이 보이게</div>
+        </div>
+        <div class="photo-box" id="pb-top" onclick="triggerUpload('top')">
+          <div class="pb-icon">📷</div>
+          <div class="pb-name">정수리</div>
+          <div class="pb-sub">머리 위에서</div>
+        </div>
+        <div class="photo-box" id="pb-side" onclick="triggerUpload('side')">
+          <div class="pb-icon">📷</div>
+          <div class="pb-name">측면</div>
+          <div class="pb-sub">한쪽 옆모습</div>
+        </div>
+        <div class="photo-box skip-box" onclick="goS(3)">
+          <div class="pb-icon">⚡</div>
+          <div class="pb-name">사진 없이 진행</div>
+          <div class="pb-sub">간단 진단 받기</div>
+        </div>
+      </div>
+      <input type="file" id="up-front" accept="image/*" capture="environment" class="hidden" onchange="handlePhoto('front',this)">
+      <input type="file" id="up-top" accept="image/*" capture="environment" class="hidden" onchange="handlePhoto('top',this)">
+      <input type="file" id="up-side" accept="image/*" capture="environment" class="hidden" onchange="handlePhoto('side',this)">
+
+      <div class="notice">ℹ️ <span>사진은 진료 참고 목적으로만 사용되며, 본인 동의 없이 외부에 공개되지 않습니다.</span></div>
+      <div class="nav">
+        <button class="back" onclick="goS(1)">← 이전</button>
+        <button class="nxt" id="n2" onclick="goS(3)" disabled>다음 단계로</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 3: 진행 정도 ── -->
+    <div id="s3" class="hidden">
+      <div class="step-lbl">STEP 3 · 진행 정도</div>
+      <div class="step-ttl">가장 비슷한 모습을<br>골라주세요</div>
+      <div class="step-desc">뉴헤어 의료진이 분류하는 6단계 중<br>현재 본인과 가장 가까운 단계를 선택해 주세요.</div>
+      <div class="stage-grid" id="stage-grid"></div>
+      <div class="nav">
+        <button class="back" onclick="goS(2)">← 이전</button>
+        <button class="nxt" id="n3" onclick="goS(4)" disabled>다음 단계로</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 4: 고민 영역 ── -->
+    <div id="s4" class="hidden">
+      <div class="step-lbl">STEP 4 · 고민 영역</div>
+      <div class="step-ttl">어디가 가장<br>신경 쓰이세요?</div>
+      <div class="step-desc">중복 선택이 가능해요. 신경 쓰이는 부위를 모두 골라주세요.</div>
+      <div class="area-grid" id="area-grid"></div>
+      <div class="nav">
+        <button class="back" onclick="goS(3)">← 이전</button>
+        <button class="nxt" id="n4" onclick="goS(5)" disabled>다음 단계로</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 5: 이마선 ── -->
+    <div id="s5" class="hidden">
+      <div class="step-lbl">STEP 5 · 이마선</div>
+      <div class="step-ttl">이마선을<br>내리고 싶으세요?</div>
+      <div class="step-desc">원하시는 정도가 있다면 알려주세요.<br>아직 잘 모르겠다면 그대로 선택해 주셔도 괜찮아요.</div>
+      <div class="opt-list">
+        <div class="opt" onclick="selOpt('hl',0,this)"><div><div class="opt-main">내리지 않을래요</div><div class="opt-sub">현재 이마선 유지</div></div><div class="opt-check">✓</div></div>
+        <div class="opt" onclick="selOpt('hl',1,this)"><div><div class="opt-main">1cm 정도</div><div class="opt-sub">살짝 내리기</div></div><div class="opt-check">✓</div></div>
+        <div class="opt" onclick="selOpt('hl',2,this)"><div><div class="opt-main">2cm 정도</div><div class="opt-sub">눈에 띄게 내리기</div></div><div class="opt-check">✓</div></div>
+        <div class="opt" onclick="selOpt('hl',3,this)"><div><div class="opt-main">3cm 이상</div><div class="opt-sub">확실하게 내리기</div></div><div class="opt-check">✓</div></div>
+        <div class="opt" onclick="selOpt('hl',4,this)"><div><div class="opt-main">아직 잘 모르겠어요</div><div class="opt-sub">의료진과 상담 후 결정</div></div><div class="opt-check">✓</div></div>
+      </div>
+      <div class="nav">
+        <button class="back" onclick="goS(4)">← 이전</button>
+        <button class="nxt" id="n5" onclick="goS(6)" disabled>다음 단계로</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 6: 원하는 결과 ── -->
+    <div id="s6" class="hidden">
+      <div class="step-lbl">STEP 6 · 원하는 결과</div>
+      <div class="step-ttl">어떤 느낌을<br>원하세요?</div>
+      <div class="step-desc">밀도에 따라 필요한 모수가 달라져요.<br>편하게 골라주세요. 의료진이 한 번 더 체크해 드려요.</div>
+      <div class="opt-list">
+        <div class="opt" onclick="selOpt('feel',0,this)"><div><div class="opt-main">자연스럽게</div><div class="opt-sub">편안한 인상</div></div><div class="opt-check">✓</div></div>
+        <div class="opt" onclick="selOpt('feel',1,this)"><div><div class="opt-main">적당히</div><div class="opt-sub">추천 밀도</div></div><div class="opt-check">✓</div></div>
+        <div class="opt" onclick="selOpt('feel',2,this)"><div><div class="opt-main">풍성하게</div><div class="opt-sub">뚜렷한 변화</div></div><div class="opt-check">✓</div></div>
+      </div>
+      <div class="nav">
+        <button class="back" onclick="goS(5)">← 이전</button>
+        <button class="nxt" id="n6" onclick="startAna()" disabled>결과 확인하기</button>
+      </div>
+    </div>
+
+    <!-- ── Analyzing ── -->
+    <div class="ana-wrap" id="ana">
+      <div class="ana-ring-wrap"><div class="ring1"></div><div class="ring2"></div></div>
+      <div class="ana-ttl">AI가 분석하고 있습니다</div>
+      <div class="ana-desc">잠시만 기다려 주세요</div>
+      <ul class="ana-steps">
+        <li class="as active" id="as1">🔍 입력 정보 확인 중...</li>
+        <li class="as" id="as2">📷 두피 사진 분석 중...</li>
+        <li class="as" id="as3">🧬 탈모 패턴 판정 중...</li>
+        <li class="as" id="as4">🧮 필요 모수 계산 중...</li>
+      </ul>
+    </div>
+
+    <!-- ── Result ── -->
+    <div id="result" class="hidden">
+      <div class="res-card">
+        <div class="res-hero">
+          <div class="res-lbl">AI 분석 완료 · 예상 필요 모수</div>
+          <div class="res-big" id="r-num">—</div>
+          <div class="res-unit">모낭 단위 (Grafts)</div>
+          <div class="res-range" id="r-range">—</div>
+        </div>
+        <div class="res-body">
+          <div class="ai-box">
+            <div class="ai-hd">
+              <span class="ai-badge">AI 분석</span>
+              <span class="ai-ttl" id="r-atitle">분석 결과</span>
+            </div>
+            <div class="ai-txt" id="r-atxt"></div>
+          </div>
+
+          <div class="d-grid">
+            <div class="di"><div class="dk">탈모 단계</div><div class="dv" id="r-stage">—</div><div class="ds">노우드 분류</div></div>
+            <div class="di"><div class="dk">예상 이식 면적</div><div class="dv" id="r-area">—</div><div class="ds">cm²</div></div>
+            <div class="di"><div class="dk">권장 밀도</div><div class="dv" id="r-dens">—</div><div class="ds">모/cm²</div></div>
+            <div class="di"><div class="dk">예상 시술 시간</div><div class="dv" id="r-time">—</div><div class="ds">총 소요 시간</div></div>
+          </div>
+
+          <div class="kakao-preview">
+            <div class="kp-title">📨 카카오 채널로 전송될 내용 미리보기</div>
+            <div class="kp-bubble" id="kakao-preview-msg"></div>
+          </div>
+
+          <div class="disc">※ 본 결과는 AI 분석을 기반으로 한 예상치이며, 실제 필요 모수는 두피 상태·모발 굵기·공여부 밀도 등에 따라 달라질 수 있습니다. 정확한 진단은 전문의 대면 상담을 통해 확인하시기 바랍니다.</div>
+
+          <button class="kakao-cta" onclick="openKakao()">
+            <svg class="kakao-icon" viewBox="0 0 24 24" fill="#191919">
+              <path d="M12 3C6.477 3 2 6.972 2 12c0 3.104 1.728 5.836 4.344 7.499L5.25 22.5l4.547-2.395C10.453 20.355 11.215 20.5 12 20.5c5.523 0 10-3.806 10-8.5S17.523 3 12 3z"/>
+            </svg>
+            카카오톡으로 상담 신청하기
+          </button>
+          <div class="kakao-sub">버튼을 누르면 뉴헤어 카카오 채널로 연결되며<br>분석 결과가 클립보드에 자동 복사됩니다</div>
+
+          <button class="restart-btn" onclick="restart()">← 처음부터 다시 계산하기</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /bd -->
+</div><!-- /app -->
+
+<script>
+  const KAKAO_URL = 'https://pf.kakao.com/_BxdxlPxd/chat';
+
+  const ud = { name:'', gender:'', year:'', phone:'', photos:{}, stage:null, areas:[], hl:null, feel:null };
+
+  const stages = [
+    { id:0, name:'경미한 변화', sub:'M자 라인이 살짝 후퇴하기 시작', grafts:800,  area:25,  nw:'II'  },
+    { id:1, name:'M자 진행',    sub:'이마 양옆이 뚜렷하게 들어감',   grafts:1400, area:42,  nw:'III' },
+    { id:2, name:'정수리(O자)', sub:'정수리 부위가 비어 보임',        grafts:1800, area:55,  nw:'IV'  },
+    { id:3, name:'M자 + 정수리',sub:'앞이마와 정수리 모두 진행',      grafts:2400, area:75,  nw:'V'   },
+    { id:4, name:'광범위 진행', sub:'앞~정수리까지 연결되어 보임',    grafts:3200, area:100, nw:'VI'  },
+    { id:5, name:'심한 진행',   sub:'머리 앞 절반 이상이 비어 있음',  grafts:4200, area:130, nw:'VII' },
+  ];
+
+  const areaMap  = { high:'높은 이마', mja:'M자 이마', crown:'정수리', all:'두피 전체' };
+  const hlMap    = ['내리지 않음','1cm 내리기','2cm 내리기','3cm 이상 내리기','상담 후 결정'];
+  const feelMap  = ['자연스럽게','적당히','풍성하게'];
+
+  /* SVG helpers */
+  function drawHead(id) {
+    const bald = [
+      '',
+      '<ellipse cx="40" cy="26" rx="9" ry="7" fill="#e8c87a" opacity=".5"/>',
+      '<ellipse cx="40" cy="32" rx="12" ry="10" fill="#e8c87a" opacity=".55"/>',
+      '<ellipse cx="40" cy="27" rx="8" ry="6" fill="#e8c87a" opacity=".5"/><ellipse cx="40" cy="40" rx="11" ry="9" fill="#e8c87a" opacity=".5"/>',
+      '<ellipse cx="40" cy="30" rx="18" ry="16" fill="#e8c87a" opacity=".6"/>',
+      '<ellipse cx="40" cy="30" rx="22" ry="20" fill="#e8c87a" opacity=".7"/>',
+    ];
+    return `<svg viewBox="0 0 80 70" class="stage-head-svg">
+      <ellipse cx="40" cy="38" rx="28" ry="24" fill="#f0e8d8"/>
+      <ellipse cx="40" cy="20" rx="22" ry="16" fill="#3d2b1f"/>
+      ${bald[id]||''}
+      <ellipse cx="40" cy="48" rx="16" ry="10" fill="#f5dfc8"/>
+      <circle cx="35" cy="46" r="2" fill="#c8a080"/>
+      <circle cx="45" cy="46" r="2" fill="#c8a080"/>
+      <path d="M34 52 Q40 56 46 52" stroke="#c8a080" stroke-width="1.2" fill="none"/>
+    </svg>`;
+  }
+
+  function drawFace(type) {
+    const marks = {
+      high:  '<rect x="18" y="14" width="24" height="6" rx="3" fill="#e8c87a" opacity=".7"/>',
+      mja:   '<path d="M18 18 L26 22 M54 18 L46 22" stroke="#e8c87a" stroke-width="3" stroke-linecap="round"/>',
+      crown: '<ellipse cx="36" cy="12" rx="10" ry="7" fill="#e8c87a" opacity=".7"/>',
+      all:   '<ellipse cx="36" cy="16" rx="16" ry="12" fill="#e8c87a" opacity=".6"/>',
+    };
+    return `<svg viewBox="0 0 72 72" class="area-face">
+      <ellipse cx="36" cy="42" rx="22" ry="20" fill="#f0e8d8"/>
+      <ellipse cx="36" cy="22" rx="18" ry="16" fill="#3d2b1f"/>
+      ${marks[type]||''}
+      <circle cx="30" cy="42" r="2.5" fill="#c8a080"/>
+      <circle cx="42" cy="42" r="2.5" fill="#c8a080"/>
+      <path d="M29 49 Q36 54 43 49" stroke="#c8a080" stroke-width="1.2" fill="none"/>
+    </svg>`;
+  }
+
+  /* Render dynamic grids */
+  function renderStages() {
+    document.getElementById('stage-grid').innerHTML = stages.map(s => `
+      <button class="stage-btn" onclick="selStage(${s.id},this)">
+        ${drawHead(s.id)}
+        <div class="stage-name">${s.name}</div>
+        <div class="stage-sub">${s.sub}</div>
+      </button>`).join('');
+  }
+
+  function renderAreas() {
+    document.getElementById('area-grid').innerHTML = Object.entries(areaMap).map(([k,v]) => `
+      <button class="area-btn" id="area-${k}" onclick="togArea('${k}',this)">
+        ${drawFace(k)}
+        <div class="area-name">${v}</div>
+      </button>`).join('');
+  }
+
+  /* Step 1 validation */
+  function checkS1() {
+    const ok = document.getElementById('f-name').value.trim() &&
+      ud.gender &&
+      document.getElementById('f-y').value.length  === 4 &&
+      document.getElementById('f-mo').value.length >= 1 &&
+      document.getElementById('f-d').value.length  >= 1 &&
+      document.getElementById('f-p1').value.length >= 3 &&
+      document.getElementById('f-p2').value.length >= 3 &&
+      document.getElementById('f-p3').value.length >= 3;
+    document.getElementById('n1').disabled = !ok;
+  }
+
+  function selGender(g) {
+    ud.gender = g;
+    document.getElementById('gt-m').classList.toggle('sel', g === 'm');
+    document.getElementById('gt-f').classList.toggle('sel', g === 'f');
+    checkS1();
+  }
+
+  /* Photo */
+  function triggerUpload(t) { document.getElementById('up-' + t).click(); }
+
+  function handlePhoto(type, inp) {
+    const file = inp.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      ud.photos[type] = true;
+      const box = document.getElementById('pb-' + type);
+      box.innerHTML = `<img src="${e.target.result}" class="photo-thumb">
+        <div class="uploaded-badge">✓</div>
+        <div class="pb-name">${type==='front'?'정면':type==='top'?'정수리':'측면'}</div>`;
+      box.classList.add('uploaded');
+      document.getElementById('n2').disabled = false;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /* Stage */
+  function selStage(id, el) {
+    ud.stage = stages[id];
+    document.querySelectorAll('.stage-btn').forEach(b => b.classList.remove('sel'));
+    el.classList.add('sel');
+    document.getElementById('n3').disabled = false;
+  }
+
+  /* Area */
+  function togArea(id, el) {
+    const i = ud.areas.indexOf(id);
+    if (i === -1) { ud.areas.push(id); el.classList.add('sel'); }
+    else          { ud.areas.splice(i, 1); el.classList.remove('sel'); }
+    document.getElementById('n4').disabled = ud.areas.length === 0;
+  }
+
+  /* Option lists */
+  function selOpt(group, val, el) {
+    el.closest('.opt-list').querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+    el.classList.add('sel');
+    if (group === 'hl')   { ud.hl   = val; document.getElementById('n5').disabled = false; }
+    if (group === 'feel') { ud.feel = val; document.getElementById('n6').disabled = false; }
+  }
+
+  /* Navigation */
+  function goS(n) {
+    for (let i = 1; i <= 6; i++) {
+      const el = document.getElementById('s' + i);
+      if (el) el.classList.toggle('hidden', i !== n);
+    }
+    document.getElementById('ana').classList.add('hidden');
+    document.getElementById('result').classList.add('hidden');
+    document.getElementById('cur-pg').textContent = n;
+    document.getElementById('pb-fill').style.width = (n / 6 * 100) + '%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (n === 3) renderStages();
+    if (n === 4) renderAreas();
+  }
+
+  /* Analysis & Result */
+  async function startAna() {
+    for (let i = 1; i <= 6; i++) {
+      const el = document.getElementById('s' + i);
+      if (el) el.classList.add('hidden');
+    }
+    document.getElementById('result').classList.add('hidden');
+    document.getElementById('ana').classList.remove('hidden');
+    document.getElementById('cur-pg').textContent = '분석';
+    document.getElementById('pb-fill').style.width = '100%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const steps = ['as1','as2','as3','as4'];
+    for (let i = 0; i < steps.length; i++) {
+      await new Promise(r => setTimeout(r, 800));
+      document.getElementById(steps[i]).classList.remove('active');
+      document.getElementById(steps[i]).classList.add('done');
+      if (i + 1 < steps.length) document.getElementById(steps[i + 1]).classList.add('active');
+    }
+
+    /* 모수 계산 */
+    const feelMult  = [0.85, 1.0, 1.2][ud.feel ?? 1];
+    const areaBonus = ud.areas.includes('all') ? 600 : ud.areas.length * 250;
+    const hlBonus   = [0, 300, 500, 700, 0][ud.hl ?? 0];
+    const birthYear = parseInt(document.getElementById('f-y').value) || 1985;
+    const age       = new Date().getFullYear() - birthYear;
+    const ageMult   = age > 55 ? 1.1 : age < 30 ? 0.95 : 1.0;
+    const base      = ud.stage ? ud.stage.grafts : 1500;
+    const total     = Math.round((base + areaBonus + hlBonus) * feelMult * ageMult / 100) * 100;
+    const lo        = Math.max(total - 400, 500);
+    const hi        = total + 400;
+    const estArea   = ud.stage ? ud.stage.area + ud.areas.length * 10 : 50;
+    const dens      = ud.feel === 0 ? 35 : ud.feel === 2 ? 50 : 42;
+    const hours     = total < 1500 ? '3~4시간' : total < 2500 ? '4~6시간' : total < 3500 ? '6~8시간' : '8~10시간';
+    const method    = total > 3000 ? 'FUT+FUE 병행' : 'FUE 비절개';
+
+    const name      = document.getElementById('f-name').value.trim();
+    const gLabel    = ud.gender === 'm' ? '남성' : '여성';
+    const birth     = `${document.getElementById('f-y').value}.${document.getElementById('f-mo').value}.${document.getElementById('f-d').value}`;
+    const phone     = `${document.getElementById('f-p1').value}-${document.getElementById('f-p2').value}-${document.getElementById('f-p3').value}`;
+    const areaLabel = ud.areas.map(a => areaMap[a]).join(', ') || '미선택';
+    const hlLabel   = hlMap[ud.hl ?? 0];
+    const feelLabel = feelMap[ud.feel ?? 1];
+    const stageLabel= ud.stage ? ud.stage.name : '진행성 탈모';
+    const nwLabel   = ud.stage ? ud.stage.nw : 'III~IV';
+
+    /* 결과 화면 채우기 */
+    document.getElementById('r-num').textContent   = total.toLocaleString();
+    document.getElementById('r-range').textContent = `${lo.toLocaleString()} ~ ${hi.toLocaleString()} 모`;
+    document.getElementById('r-atitle').textContent= `노우드 ${nwLabel}단계 · ${stageLabel}`;
+    document.getElementById('r-atxt').textContent  = `${gLabel} ${age}세, ${stageLabel} 단계로 분석되었습니다. ${areaLabel} 부위에 집중 이식이 필요하며, ${feelLabel} 결과를 위해 약 ${total.toLocaleString()}모 이식을 권장합니다. 권장 시술법: ${method}.`;
+    document.getElementById('r-stage').textContent = '단계 ' + nwLabel;
+    document.getElementById('r-area').textContent  = estArea + ' cm²';
+    document.getElementById('r-dens').textContent  = dens + ' 모';
+    document.getElementById('r-time').textContent  = hours;
+
+    /* 카카오 메시지 생성 */
+    const kakaoMsg = `[뉴헤어모발성형외과] 모수 계산기 상담 신청
+
+👤 ${name} / ${gLabel} / ${birth}
+📞 ${phone}
+
+📊 AI 분석 결과
+• 탈모 단계: ${stageLabel} (노우드 ${nwLabel})
+• 예상 모수: ${total.toLocaleString()}모 (${lo.toLocaleString()}~${hi.toLocaleString()}모)
+• 고민 부위: ${areaLabel}
+• 이마선 조정: ${hlLabel}
+• 원하는 결과: ${feelLabel}
+• 권장 시술: ${method}
+• 예상 시간: ${hours}`;
+
+    window._kakaoMsg = kakaoMsg;
+
+    document.getElementById('kakao-preview-msg').innerHTML =
+      kakaoMsg.replace(/\n/g,'<br>').replace('[뉴헤어모발성형외과]','<strong>[뉴헤어모발성형외과]</strong>');
+
+    document.getElementById('ana').classList.add('hidden');
+    document.getElementById('result').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* 카카오 열기 + 클립보드 복사 */
+  function openKakao() {
+    window.open(KAKAO_URL, '_blank');
+    if (navigator.clipboard && window._kakaoMsg) {
+      navigator.clipboard.writeText(window._kakaoMsg).then(() => {
+        setTimeout(() => {
+          alert('✅ 카카오 채널로 연결됩니다!\n\n📋 분석 결과가 클립보드에 복사되었어요.\n채팅창에서 붙여넣기(Ctrl+V 또는 길게 누르기) 해주세요!');
+        }, 400);
+      }).catch(() => {
+        setTimeout(() => {
+          alert('✅ 카카오 채널로 연결됩니다!\n채팅창에서 아래 내용을 입력해 주세요.');
+        }, 400);
+      });
+    }
+  }
+
+  /* Restart */
+  function restart() {
+    ud.gender = ''; ud.photos = {}; ud.stage = null;
+    ud.areas = []; ud.hl = null; ud.feel = null;
+    window._kakaoMsg = '';
+    document.querySelectorAll('.gt').forEach(b => b.classList.remove('sel'));
+    document.querySelectorAll('.inp').forEach(inp => inp.value = '');
+    document.getElementById('n1').disabled = true;
+    document.getElementById('n2').disabled = true;
+    document.getElementById('result').classList.add('hidden');
+    goS(1);
+  }
+
+  /* Init */
+  goS(1);
+</script>
+</body>
+</html>
